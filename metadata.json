@@ -1,0 +1,6 @@
+{
+  "name": "Ezana Academy",
+  "description": "Enterprise E-learning platform offering preeminent courses in English, Mathematics, and AI Full-Stack Web Development, with robust student, instructor, and admin portals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

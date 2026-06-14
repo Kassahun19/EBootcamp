@@ -1,0 +1,1057 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Kassahun Mulatu",
+      "email": "admin@ezana.com",
+      "password": "$2b$10$oR9zT678WxKV7HojiPDHduxDTosc.oSbkrkM03je0juKWtEjN73Lq",
+      "roleId": 1,
+      "status": "active",
+      "createdAt": "2026-06-14T09:53:43.615Z"
+    },
+    {
+      "id": 2,
+      "name": "Dr. Demeke Assefa",
+      "email": "instructor@ezana.com",
+      "roleId": 2,
+      "password": "$2b$10$oR9zT678WxKV7HojiPDHduBx8YQ2Q8UfQ8gF.XKXyQZ1Odv8CUPMC",
+      "status": "active",
+      "createdAt": "2026-06-14T09:53:43.616Z"
+    },
+    {
+      "id": 3,
+      "name": "Martha Tefera",
+      "email": "student@ezana.com",
+      "roleId": 3,
+      "password": "$2b$10$oR9zT678WxKV7HojiPDHduJkp04GgAkOjmXp1W7YZqi51dc9fec0u",
+      "status": "active",
+      "createdAt": "2026-06-14T09:53:43.616Z"
+    },
+    {
+      "id": 4,
+      "name": "Sisay Alemu",
+      "email": "sisay@gmail.com",
+      "password": "$2b$10$znfHsY7RbjtQtc4sk6.zYuryawtNjdlF4AHglOeY1eNDWRAVIc5L6",
+      "roleId": 3,
+      "status": "active",
+      "createdAt": "2026-06-14T10:49:13.211Z"
+    },
+    {
+      "id": 5,
+      "name": "Kassahun",
+      "email": "kmulatu21@gmail.com",
+      "password": "$2b$10$tFjEZx3kblZXBI24hXIKVet9uifyzPvu5YomdW9pT.IFexzE856/G",
+      "roleId": 3,
+      "status": "active",
+      "createdAt": "2026-06-14T10:53:51.184Z"
+    }
+  ],
+  "roles": [
+    {
+      "id": 1,
+      "name": "admin",
+      "description": "Full access to panel"
+    },
+    {
+      "id": 2,
+      "name": "instructor",
+      "description": "Course and student management"
+    },
+    {
+      "id": 3,
+      "name": "student",
+      "description": "Access to learning materials"
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "title": "Mastering Professional Conversational English",
+      "description": "Accelerate your career with elite communication strategies, business vocabularies, native idioms, and advanced interactive pronunciations.",
+      "category": "English",
+      "instructorId": 2,
+      "duration": "12 Hours",
+      "lessonsCount": 4,
+      "thumbnail": "https://images.unsplash.com/photo-1544717305-2782549b5136?w=600",
+      "premium": true,
+      "published": true,
+      "createdAt": "2026-06-14T09:53:43.616Z"
+    },
+    {
+      "id": 2,
+      "title": "Discrete Mathematics and Analytical Calculus",
+      "description": "Construct solid structural logic foundations. Master set theory, mathematical proofs, combinations, dynamic graphing, and derivatives.",
+      "category": "Mathematics",
+      "instructorId": 2,
+      "duration": "18 Hours",
+      "lessonsCount": 4,
+      "thumbnail": "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600",
+      "premium": true,
+      "published": true,
+      "createdAt": "2026-06-14T09:53:43.617Z"
+    },
+    {
+      "id": 3,
+      "title": "AI-Powered Full Stack Web Development",
+      "description": "Build robust scalable modern applications using React, Express, and SQLite. Seamlessly deploy and leverage Gemini AI prompt orchestration and APIs.",
+      "category": "AI Full Stack",
+      "instructorId": 2,
+      "duration": "24 Hours",
+      "lessonsCount": 6,
+      "thumbnail": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600",
+      "premium": true,
+      "published": true,
+      "createdAt": "2026-06-14T09:53:43.617Z"
+    },
+    {
+      "id": 4,
+      "title": "Introduction to Web Development & Future of AI",
+      "description": "Your gateway to engineering in Ethiopia and beyond. Master the absolute basics of HTML, structured layout rendering, and prepare yourself for the developer workforce by 2030.",
+      "category": "AI Full Stack",
+      "instructorId": 2,
+      "duration": "5 Hours",
+      "lessonsCount": 6,
+      "thumbnail": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600",
+      "premium": false,
+      "published": true,
+      "createdAt": "2026-06-14T12:25:53.413Z"
+    }
+  ],
+  "modules": [
+    {
+      "id": 1,
+      "courseId": 1,
+      "title": "Module 1: Workplace Communication Dynamics",
+      "description": "Master correct tones, professional emails, and elevator pitches.",
+      "createdAt": "2026-06-14T09:53:43.617Z"
+    },
+    {
+      "id": 2,
+      "courseId": 1,
+      "title": "Module 2: Idiomatic Brilliance & Fluency",
+      "description": "Learn everyday expressions to sound authentic and highly native.",
+      "createdAt": "2026-06-14T09:53:43.618Z"
+    },
+    {
+      "id": 3,
+      "courseId": 2,
+      "title": "Module 1: Logic & Set Theory Foundations",
+      "description": "Propositional operators, set builders, Venn representations.",
+      "createdAt": "2026-06-14T09:53:43.619Z"
+    },
+    {
+      "id": 4,
+      "courseId": 2,
+      "title": "Module 2: Calculus Core Foundations",
+      "description": "Concept of limits, differentiation, and curves.",
+      "createdAt": "2026-06-14T09:53:43.619Z"
+    },
+    {
+      "id": 5,
+      "courseId": 3,
+      "title": "Module 1: Interactive Frontends with React",
+      "description": "Hooks, States, DOM diffing, and Tailwind configuration.",
+      "createdAt": "2026-06-14T09:53:43.620Z"
+    },
+    {
+      "id": 6,
+      "courseId": 3,
+      "title": "Module 2: High Performance APIs in Express & Node",
+      "description": "Routing, middleware architectures, and SQLite connections.",
+      "createdAt": "2026-06-14T09:53:43.621Z"
+    },
+    {
+      "id": 7,
+      "courseId": 3,
+      "title": "Module 3: AI Orchestration (Gemini)",
+      "description": "Leveraging Gemini APIs in node servers to build smarter interfaces.",
+      "createdAt": "2026-06-14T09:53:43.621Z"
+    },
+    {
+      "id": 8,
+      "courseId": 4,
+      "title": "Module 1: Preparing for the Future with Artificial Intelligence & AI Readiness",
+      "description": "Deep dive discussions about technological shifts, industry expectations, and self-readiness.",
+      "createdAt": "2026-06-14T12:25:53.413Z"
+    },
+    {
+      "id": 9,
+      "courseId": 4,
+      "title": "Module 2: Getting Started and HTML Basics",
+      "description": "Understand the building blocks of the web, browser layouts, and elements.",
+      "createdAt": "2026-06-14T12:25:53.413Z"
+    }
+  ],
+  "lessons": [
+    {
+      "id": 1,
+      "moduleId": 1,
+      "courseId": 1,
+      "title": "Professional Intro & Core Vocabulary",
+      "description": "How to make a high-impact first impression in business conversations.",
+      "youtubeId": "eIho2S0ZahI",
+      "isPreview": true,
+      "duration": "15 mins",
+      "createdAt": "2026-06-14T09:53:43.618Z"
+    },
+    {
+      "id": 2,
+      "moduleId": 1,
+      "courseId": 1,
+      "title": "Mastering Email Etiquette & Responses",
+      "description": "Polite vocabulary and phrases to structure clear workplace messages.",
+      "youtubeId": "qf_U64eKx08",
+      "isPreview": false,
+      "duration": "18 mins",
+      "createdAt": "2026-06-14T09:53:43.618Z"
+    },
+    {
+      "id": 3,
+      "moduleId": 2,
+      "courseId": 1,
+      "title": "Common American Idioms Explained",
+      "description": "Discover the contextual meanings of idioms used daily in professional settings.",
+      "youtubeId": "Wun8_B3M4pY",
+      "isPreview": false,
+      "duration": "22 mins",
+      "createdAt": "2026-06-14T09:53:43.618Z"
+    },
+    {
+      "id": 4,
+      "moduleId": 2,
+      "courseId": 1,
+      "title": "Sounding Natural: Intonation Drill",
+      "description": "Advanced voice rise-and-fall rhythm exercises for high clarity speech.",
+      "youtubeId": "T8X8hFmsb5U",
+      "isPreview": false,
+      "duration": "16 mins",
+      "createdAt": "2026-06-14T09:53:43.619Z"
+    },
+    {
+      "id": 5,
+      "moduleId": 3,
+      "courseId": 2,
+      "title": "Introduction to Discrete Logic Statements",
+      "description": "Master truth tables, logic Gates, conditionals, and logical equivalences.",
+      "youtubeId": "3U7u9z7zR0U",
+      "isPreview": true,
+      "duration": "22 mins",
+      "createdAt": "2026-06-14T09:53:43.619Z"
+    },
+    {
+      "id": 6,
+      "moduleId": 3,
+      "courseId": 2,
+      "title": "Sets, Subsets, and Set Operations",
+      "description": "Unions, intersections, cartesian products, and notation definitions.",
+      "youtubeId": "j98Z-Yp97OQ",
+      "isPreview": false,
+      "duration": "20 mins",
+      "createdAt": "2026-06-14T09:53:43.620Z"
+    },
+    {
+      "id": 7,
+      "moduleId": 4,
+      "courseId": 2,
+      "title": "Understanding Calculus Limits Intuitively",
+      "description": "Discover the bedrock of calculus with graphics-heavy limits definitions.",
+      "youtubeId": "YNstP0ESpsU",
+      "isPreview": false,
+      "duration": "31 mins",
+      "createdAt": "2026-06-14T09:53:43.620Z"
+    },
+    {
+      "id": 8,
+      "moduleId": 4,
+      "courseId": 2,
+      "title": "The Power Rule & Derivative Shortcuts",
+      "description": "Easy mathematical derivation techniques to find curves slopes.",
+      "youtubeId": "O9Yg28v86u0",
+      "isPreview": false,
+      "duration": "25 mins",
+      "createdAt": "2026-06-14T09:53:43.620Z"
+    },
+    {
+      "id": 9,
+      "moduleId": 5,
+      "courseId": 3,
+      "title": "React Components, Props & State Loops",
+      "description": "Learn fundamental UI rendering lifecycle and interactive state workflows.",
+      "youtubeId": "Ke90Tje7VS0",
+      "isPreview": true,
+      "duration": "35 mins",
+      "createdAt": "2026-06-14T09:53:43.621Z"
+    },
+    {
+      "id": 10,
+      "moduleId": 5,
+      "courseId": 3,
+      "title": "Styling at Light Speed with Tailwind CSS",
+      "description": "Utility classes, grid structures, layouts, animations, and transitions.",
+      "youtubeId": "UBOj6txRkco",
+      "isPreview": false,
+      "duration": "22 mins",
+      "createdAt": "2026-06-14T09:53:43.621Z"
+    },
+    {
+      "id": 11,
+      "moduleId": 6,
+      "courseId": 3,
+      "title": "ExpressJS Routes, Middlewares, and Headers",
+      "description": "Configure clean secure REST endpoints to interact with your frontend app.",
+      "youtubeId": "lY6icfhap2o",
+      "isPreview": false,
+      "duration": "40 mins",
+      "createdAt": "2026-06-14T09:53:43.622Z"
+    },
+    {
+      "id": 12,
+      "moduleId": 6,
+      "courseId": 3,
+      "title": "DB Integration: Storing relational rows safely",
+      "description": "How to construct secure relational connections and query records.",
+      "youtubeId": "HXV3zeQKqGY",
+      "isPreview": false,
+      "duration": "28 mins",
+      "createdAt": "2026-06-14T09:53:43.622Z"
+    },
+    {
+      "id": 13,
+      "moduleId": 7,
+      "courseId": 3,
+      "title": "Intro to `@google/genai` TypeScript Node SDK",
+      "description": "Generate real-time AI context tokens, complete structured outputs, and stream chats.",
+      "youtubeId": "Kz9-jSVo8mU",
+      "isPreview": false,
+      "duration": "42 mins",
+      "createdAt": "2026-06-14T09:53:43.622Z"
+    },
+    {
+      "id": 14,
+      "moduleId": 7,
+      "courseId": 3,
+      "title": "Fine-Tuning Prompts & System Instructions",
+      "description": "Structuring clean models outputs for structured visual dashboards.",
+      "youtubeId": "F1g_z0a9C4k",
+      "isPreview": false,
+      "duration": "33 mins",
+      "createdAt": "2026-06-14T09:53:43.623Z"
+    },
+    {
+      "id": 15,
+      "moduleId": 9,
+      "courseId": 4,
+      "title": "Introducing Ezana Academy",
+      "description": "Brief introduction to Ezana Academy objectives, student tracks, and e-learning facilities.",
+      "youtubeId": "-7P8QpFCZyo",
+      "isPreview": true,
+      "duration": "2 mins",
+      "createdAt": "2026-06-14T12:25:53.414Z"
+    },
+    {
+      "id": 16,
+      "moduleId": 9,
+      "courseId": 4,
+      "title": "Introduction to HTML",
+      "description": "Learn the architectural structure of a HTML template file and tag pairs.",
+      "youtubeId": "ZGl_dOoWC5c",
+      "isPreview": true,
+      "duration": "15 mins",
+      "createdAt": "2026-06-14T12:25:53.414Z"
+    },
+    {
+      "id": 17,
+      "moduleId": 9,
+      "courseId": 4,
+      "title": "HTML Basics – Part 1 | Introduction to Web Development",
+      "description": "Step-by-step introduction to tag headers, images, layout boxes, and core structural tags.",
+      "youtubeId": "DRD4I2ar7_Q",
+      "isPreview": false,
+      "duration": "25 mins",
+      "createdAt": "2026-06-14T12:25:53.414Z"
+    },
+    {
+      "id": 18,
+      "moduleId": 9,
+      "courseId": 4,
+      "title": "Basics of HTML – Part II",
+      "description": "Master advanced lists, interactive forms, links, buttons, and structured layout styling foundations.",
+      "youtubeId": "Sj_TSrRuUHw",
+      "isPreview": false,
+      "duration": "22 mins",
+      "createdAt": "2026-06-14T12:25:53.414Z"
+    },
+    {
+      "id": 19,
+      "moduleId": 8,
+      "courseId": 4,
+      "title": "ለ2030 እንዴት እንዘጋጅ? - Evangadi Night - EPS I",
+      "description": "First part of the essential discussion on career preparation and strategic tech skills for upcoming industry horizons.",
+      "youtubeId": "vx4tXeIBTNY",
+      "isPreview": true,
+      "duration": "1 Hour 10 mins",
+      "createdAt": "2026-06-14T12:25:53.414Z"
+    },
+    {
+      "id": 20,
+      "moduleId": 8,
+      "courseId": 4,
+      "title": "በ2030 በAI ላለመተካት እንዴት እንዘጋጅ? - Evangadi Night - EPS II",
+      "description": "Strategic analysis and guidance on staying irreplaceable and relevant in the golden era of generative models and automation tools.",
+      "youtubeId": "baLf033SUkg",
+      "isPreview": true,
+      "duration": "1 Hour 32 mins",
+      "createdAt": "2026-06-14T12:25:53.414Z"
+    }
+  ],
+  "youtube_videos": [],
+  "enrollments": [],
+  "payments": [
+    {
+      "id": 1,
+      "userId": 4,
+      "refNumber": "12345",
+      "notes": "Done",
+      "receiptUrl": "/uploads/receipt-1781434280856-560338590.jpg",
+      "filenameOriginal": "Screenshot_20260614_130827_Chrome.jpg",
+      "amount": 1000,
+      "paymentMethod": "Telebirr Mobile Wallet",
+      "status": "rejected",
+      "reviewNotes": "Fake receipt",
+      "verifiedAt": "2026-06-14T10:59:00.789Z",
+      "createdAt": "2026-06-14T10:51:20.863Z",
+      "updatedAt": "2026-06-14T10:59:00.789Z"
+    }
+  ],
+  "payment_receipts": [],
+  "assignments": [
+    {
+      "id": 1,
+      "courseId": 3,
+      "title": "Assignment 1: Responsive Flex Grid Form",
+      "description": "Construct a visual profile editor with clean touch-enabled Tailwind utility forms. Support profile metadata and save status alerts.",
+      "dueDate": "2026-06-30",
+      "createdAt": "2026-06-14T09:53:43.625Z"
+    }
+  ],
+  "submissions": [],
+  "quizzes": [
+    {
+      "id": 1,
+      "courseId": 3,
+      "title": "AI Full-Stack React Core Fundamentals Quiz",
+      "description": "Test your grasp of state mechanics, render intervals, and Tailwind layout logic.",
+      "passingScore": 70,
+      "createdAt": "2026-06-14T09:53:43.623Z"
+    },
+    {
+      "id": 2,
+      "courseId": 2,
+      "title": "Logic statements & sets logic test",
+      "description": "Verify your proof-building capabilities in propositional logic.",
+      "passingScore": 75,
+      "createdAt": "2026-06-14T09:53:43.624Z"
+    }
+  ],
+  "questions": [
+    {
+      "id": 1,
+      "quizId": 1,
+      "type": "multiple_choice",
+      "questionText": "Which React hook is explicitly utilized to memorize computed values and prevent redundant calculations?",
+      "options": "[\"useEffect\",\"useMemo\",\"useRef\",\"useCallback\"]",
+      "correctOptionIndex": 1,
+      "correctAnswer": "useMemo",
+      "createdAt": "2026-06-14T09:53:43.623Z"
+    },
+    {
+      "id": 2,
+      "quizId": 1,
+      "type": "true_false",
+      "questionText": "Vite binds hot module replacement on port 3000 directly inside AI Studio workspaces.",
+      "options": "[\"True\",\"False\"]",
+      "correctOptionIndex": 1,
+      "correctAnswer": "False",
+      "createdAt": "2026-06-14T09:53:43.624Z"
+    },
+    {
+      "id": 3,
+      "quizId": 1,
+      "type": "short_answer",
+      "questionText": "What is the utility class prefix used in Tailwind to implement dark mode custom styles (lowercase)?",
+      "options": null,
+      "correctOptionIndex": null,
+      "correctAnswer": "dark",
+      "createdAt": "2026-06-14T09:53:43.624Z"
+    },
+    {
+      "id": 4,
+      "quizId": 2,
+      "type": "multiple_choice",
+      "questionText": "In propositional logic, when is a conditional statement (p → q) FALSE?",
+      "options": "[\"When p is true and q is false\",\"When p is false and q is true\",\"When both are false\",\"When both are true\"]",
+      "correctOptionIndex": 0,
+      "correctAnswer": "When p is true and q is false",
+      "createdAt": "2026-06-14T09:53:43.625Z"
+    }
+  ],
+  "quiz_attempts": [],
+  "certificates": [],
+  "notifications": [
+    {
+      "id": 1,
+      "userId": 3,
+      "title": "Welcome to Ezana Academy!",
+      "message": "Your enrollment workspace is loaded and prepared. Navigate to the courses catalog to watch free preview demo courses elements.",
+      "isRead": false,
+      "createdAt": "2026-06-14T09:53:43.625Z"
+    },
+    {
+      "id": 2,
+      "user_id": null,
+      "type": "greeting",
+      "subject": "Contact Form (GREETING): Greetings.",
+      "message": "An external form submission was entered on the web portal.\n\nFrom: Sisay Alemu (sisay@gmail.com)\nSubject: Greetings.\n\nMessage:\nHi Kassahun,\nMy name is Sisay Alemu. I'm from Bahir Dar.\nI want to register for a course at your academy, so how do I get started?\n\nYours,\nSisay Alemu\n",
+      "is_read": false,
+      "email_sent": true,
+      "created_at": "2026-06-14T10:26:50.657Z",
+      "createdAt": "2026-06-14T10:26:50.657Z",
+      "updatedAt": "2026-06-14T10:26:54.743Z"
+    },
+    {
+      "id": 3,
+      "user_id": 4,
+      "type": "student_registration",
+      "subject": "New Student Registration: Sisay Alemu",
+      "message": "A new learning account has been established on the platform.\n\nStudent Name: Sisay Alemu\nEmail: sisay@gmail.com\nStatus: Active",
+      "is_read": false,
+      "email_sent": true,
+      "created_at": "2026-06-14T10:49:13.212Z",
+      "createdAt": "2026-06-14T10:49:13.212Z",
+      "updatedAt": "2026-06-14T10:49:14.865Z"
+    },
+    {
+      "id": 4,
+      "user_id": 4,
+      "type": "payment_receipt",
+      "subject": "Premium Upgrade & Receipt Proof: Ref 12345",
+      "message": "A student submitted a payment receipt for Lifetime Premium Access.\n\nStudent Name: Sisay Alemu\nMethod: Telebirr Mobile Wallet\nRef number: 12345\nAmount: ETB 1000\nNotes: Done",
+      "file_url": "/uploads/receipt-1781434280856-560338590.jpg",
+      "is_read": false,
+      "email_sent": true,
+      "created_at": "2026-06-14T10:51:20.864Z",
+      "createdAt": "2026-06-14T10:51:20.864Z",
+      "updatedAt": "2026-06-14T10:51:21.763Z"
+    },
+    {
+      "id": 5,
+      "userId": 4,
+      "title": "Payment Receipt Submitted",
+      "message": "Your payment receipt for ETB 1,000 reference 12345 was received. Admin is verifying the bank credentials.",
+      "isRead": true,
+      "createdAt": "2026-06-14T10:51:20.866Z"
+    },
+    {
+      "id": 6,
+      "user_id": 5,
+      "type": "student_registration",
+      "subject": "New Student Registration: Kassahun",
+      "message": "A new learning account has been established on the platform.\n\nStudent Name: Kassahun\nEmail: kmulatu21@gmail.com\nStatus: Active",
+      "is_read": true,
+      "email_sent": true,
+      "created_at": "2026-06-14T10:53:51.185Z",
+      "createdAt": "2026-06-14T10:53:51.185Z",
+      "updatedAt": "2026-06-14T10:59:42.980Z",
+      "isRead": true
+    },
+    {
+      "id": 7,
+      "userId": 4,
+      "title": "Payment Verification Unsuccessful ⚠️",
+      "message": "Payment request reference 12345 rejected. Reason: Fake receipt. Please upload corrected payment paperwork.",
+      "isRead": true,
+      "createdAt": "2026-06-14T10:59:00.790Z"
+    },
+    {
+      "id": 8,
+      "userId": 3,
+      "title": "Final Exam Schedule",
+      "message": "Dear students, your final exam will start on the upcoming week. So, get ready for the exam.\n\nThe Academy",
+      "isRead": false,
+      "createdAt": "2026-06-14T11:18:56.737Z"
+    },
+    {
+      "id": 9,
+      "userId": 4,
+      "title": "Final Exam Schedule",
+      "message": "Dear students, your final exam will start on the upcoming week. So, get ready for the exam.\n\nThe Academy",
+      "isRead": true,
+      "createdAt": "2026-06-14T11:18:56.738Z"
+    },
+    {
+      "id": 10,
+      "userId": 5,
+      "title": "Final Exam Schedule",
+      "message": "Dear students, your final exam will start on the upcoming week. So, get ready for the exam.\n\nThe Academy",
+      "isRead": false,
+      "createdAt": "2026-06-14T11:18:56.740Z"
+    }
+  ],
+  "testimonials": [
+    {
+      "id": 1,
+      "name": "Abebe Kebede",
+      "role": "Software Engineer",
+      "content": "Ezana Academy completely shifted my career trajectory. The AI Full Stack course is direct, rigorous, and highly practical.",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"
+    },
+    {
+      "id": 2,
+      "name": "Helen Alula",
+      "role": "Maths Teacher",
+      "content": "The discrete mathematics and Calculus modules are brilliantly structured. Highly recommended for students of all backgrounds.",
+      "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150"
+    },
+    {
+      "id": 3,
+      "name": "Michael Demeke",
+      "role": "SaaS Starter",
+      "content": "The payment workflow is simple, and the instructor feedback on assignments is top-tier. Lifetime access is totally worth ETB 1,000.",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150"
+    }
+  ],
+  "contact_messages": [
+    {
+      "id": 1,
+      "name": "Samuel Hailu",
+      "email": "samuel@example.com",
+      "subject": "SaaS Partnership",
+      "message": "Hello, do you offer corporate packages for tech training?",
+      "date": "2026-06-05T10:30:00Z"
+    },
+    {
+      "id": 2,
+      "name": "Sisay Alemu",
+      "email": "sisay@gmail.com",
+      "subject": "Greetings.",
+      "message": "Hi Kassahun,\nMy name is Sisay Alemu. I'm from Bahir Dar.\nI want to register for a course at your academy, so how do I get started?\n\nYours,\nSisay Alemu\n",
+      "date": "2026-06-14T10:26:50.656Z",
+      "createdAt": "2026-06-14T10:26:50.657Z"
+    }
+  ],
+  "activity_logs": [
+    {
+      "id": 1,
+      "userId": null,
+      "action": "DB INSTALL",
+      "details": "Created Roles table.",
+      "timestamp": "2026-06-14T09:53:43.254Z"
+    },
+    {
+      "id": 2,
+      "userId": null,
+      "action": "INSERT into users",
+      "details": "Record created with ID: 1",
+      "timestamp": "2026-06-14T09:53:43.616Z"
+    },
+    {
+      "id": 3,
+      "userId": null,
+      "action": "INSERT into users",
+      "details": "Record created with ID: 2",
+      "timestamp": "2026-06-14T09:53:43.616Z"
+    },
+    {
+      "id": 4,
+      "userId": null,
+      "action": "INSERT into users",
+      "details": "Record created with ID: 3",
+      "timestamp": "2026-06-14T09:53:43.616Z"
+    },
+    {
+      "id": 5,
+      "userId": null,
+      "action": "INSERT into courses",
+      "details": "Record created with ID: 1",
+      "timestamp": "2026-06-14T09:53:43.617Z"
+    },
+    {
+      "id": 6,
+      "userId": null,
+      "action": "INSERT into courses",
+      "details": "Record created with ID: 2",
+      "timestamp": "2026-06-14T09:53:43.617Z"
+    },
+    {
+      "id": 7,
+      "userId": null,
+      "action": "INSERT into courses",
+      "details": "Record created with ID: 3",
+      "timestamp": "2026-06-14T09:53:43.617Z"
+    },
+    {
+      "id": 8,
+      "userId": null,
+      "action": "INSERT into modules",
+      "details": "Record created with ID: 1",
+      "timestamp": "2026-06-14T09:53:43.617Z"
+    },
+    {
+      "id": 9,
+      "userId": null,
+      "action": "INSERT into modules",
+      "details": "Record created with ID: 2",
+      "timestamp": "2026-06-14T09:53:43.618Z"
+    },
+    {
+      "id": 10,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 1",
+      "timestamp": "2026-06-14T09:53:43.618Z"
+    },
+    {
+      "id": 11,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 2",
+      "timestamp": "2026-06-14T09:53:43.618Z"
+    },
+    {
+      "id": 12,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 3",
+      "timestamp": "2026-06-14T09:53:43.619Z"
+    },
+    {
+      "id": 13,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 4",
+      "timestamp": "2026-06-14T09:53:43.619Z"
+    },
+    {
+      "id": 14,
+      "userId": null,
+      "action": "INSERT into modules",
+      "details": "Record created with ID: 3",
+      "timestamp": "2026-06-14T09:53:43.619Z"
+    },
+    {
+      "id": 15,
+      "userId": null,
+      "action": "INSERT into modules",
+      "details": "Record created with ID: 4",
+      "timestamp": "2026-06-14T09:53:43.619Z"
+    },
+    {
+      "id": 16,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 5",
+      "timestamp": "2026-06-14T09:53:43.620Z"
+    },
+    {
+      "id": 17,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 6",
+      "timestamp": "2026-06-14T09:53:43.620Z"
+    },
+    {
+      "id": 18,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 7",
+      "timestamp": "2026-06-14T09:53:43.620Z"
+    },
+    {
+      "id": 19,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 8",
+      "timestamp": "2026-06-14T09:53:43.620Z"
+    },
+    {
+      "id": 20,
+      "userId": null,
+      "action": "INSERT into modules",
+      "details": "Record created with ID: 5",
+      "timestamp": "2026-06-14T09:53:43.621Z"
+    },
+    {
+      "id": 21,
+      "userId": null,
+      "action": "INSERT into modules",
+      "details": "Record created with ID: 6",
+      "timestamp": "2026-06-14T09:53:43.621Z"
+    },
+    {
+      "id": 22,
+      "userId": null,
+      "action": "INSERT into modules",
+      "details": "Record created with ID: 7",
+      "timestamp": "2026-06-14T09:53:43.621Z"
+    },
+    {
+      "id": 23,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 9",
+      "timestamp": "2026-06-14T09:53:43.621Z"
+    },
+    {
+      "id": 24,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 10",
+      "timestamp": "2026-06-14T09:53:43.622Z"
+    },
+    {
+      "id": 25,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 11",
+      "timestamp": "2026-06-14T09:53:43.622Z"
+    },
+    {
+      "id": 26,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 12",
+      "timestamp": "2026-06-14T09:53:43.622Z"
+    },
+    {
+      "id": 27,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 13",
+      "timestamp": "2026-06-14T09:53:43.622Z"
+    },
+    {
+      "id": 28,
+      "userId": null,
+      "action": "INSERT into lessons",
+      "details": "Record created with ID: 14",
+      "timestamp": "2026-06-14T09:53:43.623Z"
+    },
+    {
+      "id": 29,
+      "userId": null,
+      "action": "INSERT into quizzes",
+      "details": "Record created with ID: 1",
+      "timestamp": "2026-06-14T09:53:43.623Z"
+    },
+    {
+      "id": 30,
+      "userId": null,
+      "action": "INSERT into questions",
+      "details": "Record created with ID: 1",
+      "timestamp": "2026-06-14T09:53:43.623Z"
+    },
+    {
+      "id": 31,
+      "userId": null,
+      "action": "INSERT into questions",
+      "details": "Record created with ID: 2",
+      "timestamp": "2026-06-14T09:53:43.624Z"
+    },
+    {
+      "id": 32,
+      "userId": null,
+      "action": "INSERT into questions",
+      "details": "Record created with ID: 3",
+      "timestamp": "2026-06-14T09:53:43.624Z"
+    },
+    {
+      "id": 33,
+      "userId": null,
+      "action": "INSERT into quizzes",
+      "details": "Record created with ID: 2",
+      "timestamp": "2026-06-14T09:53:43.624Z"
+    },
+    {
+      "id": 34,
+      "userId": null,
+      "action": "INSERT into questions",
+      "details": "Record created with ID: 4",
+      "timestamp": "2026-06-14T09:53:43.625Z"
+    },
+    {
+      "id": 35,
+      "userId": null,
+      "action": "INSERT into assignments",
+      "details": "Record created with ID: 1",
+      "timestamp": "2026-06-14T09:53:43.625Z"
+    },
+    {
+      "id": 36,
+      "userId": null,
+      "action": "INSERT into notifications",
+      "details": "Record created with ID: 1",
+      "timestamp": "2026-06-14T09:53:43.626Z"
+    },
+    {
+      "id": 37,
+      "userId": null,
+      "action": "DB INSTALL",
+      "details": "Enterprise tables schema and seeding datasets fully reloaded.",
+      "timestamp": "2026-06-14T09:53:43.626Z"
+    },
+    {
+      "id": 38,
+      "userId": null,
+      "action": "INSERT into contact_messages",
+      "details": "Record created with ID: 2",
+      "timestamp": "2026-06-14T10:26:50.657Z"
+    },
+    {
+      "id": 39,
+      "userId": null,
+      "action": "INSERT into notifications",
+      "details": "Record created with ID: 2",
+      "timestamp": "2026-06-14T10:26:50.658Z"
+    },
+    {
+      "id": 40,
+      "userId": null,
+      "action": "UPDATE notifications",
+      "details": "Record ID: 2 updated.",
+      "timestamp": "2026-06-14T10:26:51.760Z"
+    },
+    {
+      "id": 41,
+      "userId": null,
+      "action": "UPDATE notifications",
+      "details": "Record ID: 2 updated.",
+      "timestamp": "2026-06-14T10:26:54.743Z"
+    },
+    {
+      "id": 42,
+      "userId": null,
+      "action": "INSERT into users",
+      "details": "Record created with ID: 4",
+      "timestamp": "2026-06-14T10:49:13.212Z"
+    },
+    {
+      "id": 43,
+      "userId": null,
+      "action": "INSERT into notifications",
+      "details": "Record created with ID: 3",
+      "timestamp": "2026-06-14T10:49:13.213Z"
+    },
+    {
+      "id": 44,
+      "userId": null,
+      "action": "UPDATE notifications",
+      "details": "Record ID: 3 updated.",
+      "timestamp": "2026-06-14T10:49:14.866Z"
+    },
+    {
+      "id": 45,
+      "userId": null,
+      "action": "INSERT into payments",
+      "details": "Record created with ID: 1",
+      "timestamp": "2026-06-14T10:51:20.864Z"
+    },
+    {
+      "id": 46,
+      "userId": null,
+      "action": "INSERT into notifications",
+      "details": "Record created with ID: 4",
+      "timestamp": "2026-06-14T10:51:20.865Z"
+    },
+    {
+      "id": 47,
+      "userId": null,
+      "action": "INSERT into notifications",
+      "details": "Record created with ID: 5",
+      "timestamp": "2026-06-14T10:51:20.866Z"
+    },
+    {
+      "id": 48,
+      "userId": null,
+      "action": "UPDATE notifications",
+      "details": "Record ID: 4 updated.",
+      "timestamp": "2026-06-14T10:51:21.763Z"
+    },
+    {
+      "id": 49,
+      "userId": null,
+      "action": "INSERT into users",
+      "details": "Record created with ID: 5",
+      "timestamp": "2026-06-14T10:53:51.185Z"
+    },
+    {
+      "id": 50,
+      "userId": null,
+      "action": "INSERT into notifications",
+      "details": "Record created with ID: 6",
+      "timestamp": "2026-06-14T10:53:51.185Z"
+    },
+    {
+      "id": 51,
+      "userId": null,
+      "action": "UPDATE notifications",
+      "details": "Record ID: 6 updated.",
+      "timestamp": "2026-06-14T10:53:52.106Z"
+    },
+    {
+      "id": 52,
+      "userId": null,
+      "action": "UPDATE payments",
+      "details": "Record ID: 1 updated.",
+      "timestamp": "2026-06-14T10:59:00.790Z"
+    },
+    {
+      "id": 53,
+      "userId": null,
+      "action": "INSERT into notifications",
+      "details": "Record created with ID: 7",
+      "timestamp": "2026-06-14T10:59:00.791Z"
+    },
+    {
+      "id": 54,
+      "userId": null,
+      "action": "UPDATE notifications",
+      "details": "Record ID: 6 updated.",
+      "timestamp": "2026-06-14T10:59:42.981Z"
+    },
+    {
+      "id": 55,
+      "userId": null,
+      "action": "INSERT into notifications",
+      "details": "Record created with ID: 8",
+      "timestamp": "2026-06-14T11:18:56.738Z"
+    },
+    {
+      "id": 56,
+      "userId": null,
+      "action": "INSERT into notifications",
+      "details": "Record created with ID: 9",
+      "timestamp": "2026-06-14T11:18:56.739Z"
+    },
+    {
+      "id": 57,
+      "userId": null,
+      "action": "INSERT into notifications",
+      "details": "Record created with ID: 10",
+      "timestamp": "2026-06-14T11:18:56.740Z"
+    }
+  ],
+  "settings": [
+    {
+      "key": "site_name",
+      "value": "Ezana Academy"
+    },
+    {
+      "key": "premium_price_etb",
+      "value": "1000"
+    },
+    {
+      "key": "payment_account_info",
+      "value": "CBE Birr / Telebirr - Ye-Buna Link"
+    }
+  ]
+}
