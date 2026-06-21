@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, HelpCircle, CheckCircle, Video, Award, Star, Users, Briefcase, ChevronRight, Mail, Phone, MapPin, Send, AlertTriangle, Play, Lock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { FALLBACK_DATABASE_STATE } from '../lib/fallbackData';
 
 interface Course {
   id: number;
@@ -99,8 +100,8 @@ export default function LandingPage({
   onShowDemoVideo: (youtubeId: string, title: string) => void;
 }) {
   const { user } = useAuth();
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [courses, setCourses] = useState<Course[]>(FALLBACK_DATABASE_STATE.courses);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(FALLBACK_DATABASE_STATE.testimonials);
   const [stats, setStats] = useState<Stats>({
     totalStudents: 452,
     totalInstructors: 3,

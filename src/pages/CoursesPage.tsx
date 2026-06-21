@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, MapPin, Users, Video, Eye, ShieldAlert, Play, Lock, ChevronRight, Activity, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { FALLBACK_DATABASE_STATE } from '../lib/fallbackData';
 
 interface Lesson {
   id: number;
@@ -47,7 +48,7 @@ export default function CoursesPage({
   promptPremiumUpgrade: () => void;
 }) {
   const { user } = useAuth();
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<Course[]>(FALLBACK_DATABASE_STATE.courses);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [activeTab, setActiveTab] = useState<'All' | 'English' | 'Mathematics' | 'AI Full Stack'>('All');
   const [loading, setLoading] = useState(true);
@@ -91,15 +92,22 @@ export default function CoursesPage({
       const res = await fetch('/api/courses');
       if (res.ok) {
         const list = await res.json();
-        setCourses(list);
-        if (initialSelectedCourseId) {
-          fetchCourseDetails(initialSelectedCourseId);
+        if (list && list.length > 0) {
+          setCourses(list);
+        } else {
+          setCourses(FALLBACK_DATABASE_STATE.courses);
         }
+      } else {
+        setCourses(FALLBACK_DATABASE_STATE.courses);
       }
     } catch (e) {
       console.error("Error fetching courses List:", e);
+      setCourses(FALLBACK_DATABASE_STATE.courses);
     } finally {
       setLoading(false);
+      if (initialSelectedCourseId) {
+        fetchCourseDetails(initialSelectedCourseId);
+      }
     }
   };
 
@@ -109,9 +117,25 @@ export default function CoursesPage({
       if (res.ok) {
         const item = await res.json();
         setSelectedCourse(item);
+        return;
       }
     } catch (e) {
       console.error("Error loaded individual course Details:", e);
+    }
+
+    // High performance local fallback
+    const matchedCourse = FALLBACK_DATABASE_STATE.courses.find(c => c.id === id);
+    if (matchedCourse) {
+      const courseModules = FALLBACK_DATABASE_STATE.modules
+        .filter(m => m.courseId === id)
+        .map(mod => ({
+          ...mod,
+          lessons: FALLBACK_DATABASE_STATE.lessons.filter(l => l.moduleId === mod.id)
+        }));
+      setSelectedCourse({
+        ...matchedCourse,
+        modules: courseModules
+      });
     }
   };
 

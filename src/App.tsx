@@ -15,6 +15,7 @@ import InstructorDashboard from './dashboards/InstructorDashboard';
 import AdminDashboard from './dashboards/AdminDashboard';
 import AccountSettingsPage from './pages/AccountSettingsPage';
 import ContactPage from './pages/ContactPage';
+import { FALLBACK_DATABASE_STATE } from './lib/fallbackData';
 
 function MainAppContent() {
   const { user, token, login, logout, refreshUser, notifications, markNotificationsAsRead } = useAuth();
@@ -67,10 +68,6 @@ function MainAppContent() {
   // Hash routing choices: 'home' | 'about' | 'courses' | 'contact' | 'pricing' | 'login' | 'register' | 'forgot' | 'dashboard' | 'instructor' | 'admin'
   const [currentPage, setCurrentPage] = useState<string>('home');
   const [paramCourseId, setParamCourseId] = useState<number | null>(null);
-
-  // Database initialization banner trigger
-  const [dbEmpty, setDbEmpty] = useState(false);
-  const [dbInstallStatus, setDbInstallStatus] = useState<string | null>(null);
 
   // Navigation menu collapsible
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -154,41 +151,20 @@ function MainAppContent() {
     }
   }, [currentPage, user, token]);
 
-  async function triggerDbInstallation() {
-    try {
-      setDbInstallStatus("Configuring relational MySQL database.json tables...");
-      const res = await fetch('/install', { method: 'POST' });
-      const data = await res.json();
-      if (res.ok) {
-        setDbInstallStatus("✓ Ezana Academy seeded successfully! Refreshing dynamic course lists.");
-        setDbEmpty(false);
-        // Reload page to refresh context
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
-      } else {
-        setDbInstallStatus("Configuration issue: " + data.message);
-      }
-    } catch (e) {
-      setDbInstallStatus("Failed contacting backend installer.");
-    }
-  }
-
   useEffect(() => {
-    // Audit if database exists or holds courses on first launch
-    fetch('/api/courses')
-      .then(res => res.json())
-      .then(data => {
-        if (!data || data.length === 0) {
-          setDbEmpty(true);
-          triggerDbInstallation();
+    // Automatically seed the client-side database if it's missing or empty
+    if (!localStorage.getItem('ezana_db_sim')) {
+      localStorage.setItem('ezana_db_sim', JSON.stringify(FALLBACK_DATABASE_STATE));
+    } else {
+      try {
+        const parsed = JSON.parse(localStorage.getItem('ezana_db_sim') || '{}');
+        if (!parsed.courses || parsed.courses.length === 0) {
+          localStorage.setItem('ezana_db_sim', JSON.stringify(FALLBACK_DATABASE_STATE));
         }
-      })
-      .catch((e) => {
-        // Fallback to true if network is loading
-        setDbEmpty(true);
-        triggerDbInstallation();
-      });
+      } catch (err) {
+        localStorage.setItem('ezana_db_sim', JSON.stringify(FALLBACK_DATABASE_STATE));
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -331,24 +307,6 @@ function MainAppContent() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 font-sans selection:bg-emerald-100 select-none">
       
-      {/* 1. SEED INSTALLATION PROMPT HEADER AT TOP OF APPLICATION IF DB IS DETECTED EMPTY */}
-      {dbEmpty && (
-        <div className="bg-gradient-to-r from-teal-900 to-emerald-950 text-white p-3 text-center text-xs space-y-2 border-b border-emerald-500/30 flex flex-col md:flex-row md:items-center justify-center gap-3 relative z-50">
-          <p className="font-bold inline-flex items-center gap-1.5 justify-center">
-            <BadgeInfo className="w-4.5 h-4.5 text-emerald-400 shrink-0" />
-            <span>Database Initializer Active: Ezana Academy has no courses configured yet. Click install to populate English, Maths, & AI programs instantly!</span>
-          </p>
-          <button
-            id="seed_db_installer_btn"
-            onClick={triggerDbInstallation}
-            className="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-400 transition text-slate-950 font-black rounded text-xs select-none self-center cursor-pointer active:scale-95 whitespace-nowrap"
-          >
-            Install & Seed Database
-          </button>
-          {dbInstallStatus && <span className="font-mono text-emerald-300 font-semibold">{dbInstallStatus}</span>}
-        </div>
-      )}
-
       {/* 2. GLOBAL NAV BAR */}
       <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shadow-sm" id="global_header">
         <div className="max-w-7xl mx-auto px-4 h-18 flex items-center justify-between">
