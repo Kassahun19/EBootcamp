@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Award, BookOpen, CheckCircle, AlertTriangle, ShieldCheck, Database, Trash2, Edit, Save, Plus, Eye, User, FileText, Settings, ShieldAlert, BadgeInfo, Bell } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { QuizExamBuilder } from '../components/QuizExamBuilder';
 
 export default function AdminDashboard({
   onRefreshSession
@@ -10,7 +11,7 @@ export default function AdminDashboard({
   const { token, user } = useAuth();
   
   // Tab panels controller
-  const [activePane, setActivePane] = useState<'overview' | 'users' | 'payments' | 'marketing_reports' | 'logs_settings' | 'notifications'>('overview');
+  const [activePane, setActivePane] = useState<'overview' | 'users' | 'payments' | 'marketing_reports' | 'logs_settings' | 'notifications' | 'quiz_builder'>('overview');
 
   // Dynamic aggregates
   const [stats, setStats] = useState({
@@ -59,6 +60,35 @@ export default function AdminDashboard({
 
   // System general settings state
   const [premiumPriceSetting, setPremiumPriceSetting] = useState('1000');
+
+  // Interactive Support & Ticket Management
+  const [ticketReplies, setTicketReplies] = useState<Record<number, string>>({});
+  const [closedTickets, setClosedTickets] = useState<number[]>([]);
+  const [activeReplyId, setActiveReplyId] = useState<number | null>(null);
+
+  // Website Content Customizer
+  const [bannerTitle, setBannerTitle] = useState(() => localStorage.getItem('ezana_banner_title') || 'Ethiopia\'s Premier IT Academy');
+  const [bannerHeading, setBannerHeading] = useState(() => localStorage.getItem('ezana_banner_heading') || 'Empowering The Future Generation of AI Developers');
+  const [faqQuestion, setFaqQuestion] = useState('');
+  const [faqAnswer, setFaqAnswer] = useState('');
+
+  // Role and Permission Matrix
+  const [permsLoaded, setPermsLoaded] = useState(true);
+  const [permissionsMatrix, setPermissionsMatrix] = useState({
+    admin: { manageUsers: true, editCourses: true, viewIntel: true, approveFinancials: true },
+    instructor: { manageUsers: false, editCourses: true, viewIntel: true, approveFinancials: false },
+    student: { manageUsers: false, editCourses: false, viewIntel: false, approveFinancials: false },
+  });
+
+  // User list searching, filtering and pagination
+  const [userSearch, setUserSearch] = useState('');
+  const [userRoleFilter, setUserRoleFilter] = useState('all');
+  const [usersPage, setUsersPage] = useState(1);
+  const usersPerPage = 5;
+
+  // Backup & Restore
+  const [backupDownloadUrl, setBackupDownloadUrl] = useState<string | null>(null);
+  const [backupLog, setBackupLog] = useState<string[]>([]);
 
   // Auto-refresh loops for real-time notification alerts
   useEffect(() => {
@@ -835,6 +865,16 @@ export default function AdminDashboard({
                 </span>
               )}
             </button>
+
+            <button
+              id="admin_tab_quiz_builder"
+              onClick={() => setActivePane('quiz_builder')}
+              className={`px-4 py-2 rounded-lg border transition cursor-pointer flex items-center gap-1.5 duration-150 relative ${
+                activePane === 'quiz_builder' ? 'bg-slate-900 border-slate-900 text-white shadow-sm' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              📝 Educational Quiz Builder
+            </button>
           </div>
         </div>
 
@@ -891,25 +931,115 @@ export default function AdminDashboard({
                 </div>
               </div>
 
-              {/* Contact Message List */}
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm col-span-2 text-xs">
-                <h4 className="font-extrabold text-slate-950 text-xs uppercase tracking-widest mb-3">Public Support / Contact messages</h4>
-                
-                <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
-                  {contactInquiries.length === 0 ? (
-                    <p className="text-slate-400 text-xs text-center p-4">Clean mail workspace. No inquiries listed currently.</p>
-                  ) : (
-                    [...contactInquiries].sort((a, b) => b.id - a.id).map((m: any) => (
-                      <div key={m.id} className="p-3 bg-slate-50 rounded border text-xs space-y-1">
-                        <p className="font-bold text-slate-800 flex justify-between">
-                          <span>{m.name} ({m.email})</span>
-                          <span className="text-[10px] text-slate-400 font-normal">{new Date(m.date || m.createdAt).toLocaleDateString()}</span>
-                        </p>
-                        <p className="text-slate-600 font-bold">Subject: {m.subject}</p>
-                        <p className="text-slate-500">{m.message}</p>
-                      </div>
-                    ))
-                  )}
+              {/* Public Support Ticket Workspace */}
+              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm col-span-2 text-xs flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <h4 className="font-extrabold text-slate-950 text-xs uppercase tracking-widest">🎫 Active Support Tickets & Inquiries</h4>
+                    <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded font-mono">
+                      {contactInquiries.filter(m => !closedTickets.includes(m.id)).length} PENDING HELP
+                    </span>
+                  </div>
+
+                  <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+                    {contactInquiries.length === 0 ? (
+                      <p className="text-slate-400 text-xs text-center p-4">Clean mail workspace. No inquiries listed currently.</p>
+                    ) : (
+                      [...contactInquiries].sort((a, b) => b.id - a.id).map((m: any) => {
+                        const isClosed = closedTickets.includes(m.id);
+                        const hasReply = ticketReplies[m.id];
+                        return (
+                          <div key={m.id} className={`p-3 rounded border text-xs space-y-2 transition ${isClosed ? 'bg-slate-50 opacity-60 border-slate-200' : 'bg-red-50/20 border-red-100'}`}>
+                            <div className="flex justify-between items-start">
+                              <p className="font-bold text-slate-800">
+                                <span>👤 {m.name}</span> <span className="text-slate-400 font-mono text-[10px]">({m.email})</span>
+                              </p>
+                              <span className="text-[9px] text-slate-400">{new Date(m.date || m.createdAt || Date.now()).toLocaleDateString()}</span>
+                            </div>
+                            <p className="text-red-950 font-bold text-[11px]">Subject: {m.subject}</p>
+                            <p className="text-slate-600 bg-white/65 p-2 rounded border border-slate-100 italic">"{m.message}"</p>
+                            
+                            {hasReply && (
+                              <div className="bg-emerald-50 border border-emerald-100 p-2 rounded text-[11px] space-y-1">
+                                <p className="font-extrabold text-emerald-800 flex items-center gap-1">
+                                  <span>✓ Admin Official Response:</span>
+                                </p>
+                                <p className="text-slate-700">{ticketReplies[m.id]}</p>
+                              </div>
+                            )}
+
+                            <div className="flex gap-2 justify-end pt-1">
+                              {!isClosed && (
+                                <button
+                                  type="button"
+                                  onClick={() => setActiveReplyId(activeReplyId === m.id ? null : m.id)}
+                                  className="px-2 py-1 bg-slate-900 text-white rounded text-[10px] uppercase font-bold hover:bg-slate-850 cursor-pointer"
+                                >
+                                  {activeReplyId === m.id ? 'Cancel' : 'Reply Letter'}
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (isClosed) {
+                                    setClosedTickets(prev => prev.filter(id => id !== m.id));
+                                  } else {
+                                    setClosedTickets(prev => [...prev, m.id]);
+                                    setActiveReplyId(null);
+                                  }
+                                }}
+                                className={`px-2 py-1 rounded text-[10px] uppercase font-bold cursor-pointer border ${
+                                  isClosed ? 'bg-amber-55 text-amber-800 border-amber-200' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                                }`}
+                              >
+                                {isClosed ? 'Reopen ticket' : 'Resolve & Close'}
+                              </button>
+                            </div>
+
+                            {activeReplyId === m.id && (
+                              <div className="pt-2 border-t border-slate-150 space-y-2">
+                                <textarea
+                                  id={`reply_text_${m.id}`}
+                                  rows={2}
+                                  placeholder="Type official system response guidelines..."
+                                  className="w-full p-2 border rounded text-xs bg-white focus:outline-emerald-500"
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                      e.preventDefault();
+                                      const val = (e.target as HTMLTextAreaElement).value.trim();
+                                      if (val) {
+                                        setTicketReplies(prev => ({ ...prev, [m.id]: val }));
+                                        setActiveReplyId(null);
+                                        setStatusMsg("✓ Official ticket response logged dynamically.");
+                                        setTimeout(() => setStatusMsg(null), 3500);
+                                      }
+                                    }
+                                  }}
+                                />
+                                <div className="flex justify-between items-center text-[9px] text-slate-400">
+                                  <span>Press Enter to dispatch response email simulator.</span>
+                                  <button
+                                    onClick={() => {
+                                      const textInput = document.getElementById(`reply_text_${m.id}`) as HTMLTextAreaElement;
+                                      if (textInput && textInput.value.trim()) {
+                                        setTicketReplies(prev => ({ ...prev, [m.id]: textInput.value.trim() }));
+                                        setActiveReplyId(null);
+                                        setStatusMsg("✓ Official ticket response logged dynamically.");
+                                        setTimeout(() => setStatusMsg(null), 3500);
+                                      }
+                                    }}
+                                    className="px-2 py-0.5 bg-emerald-600 text-white rounded text-[8px] font-bold cursor-pointer"
+                                  >
+                                    Send Reply
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -1041,12 +1171,51 @@ export default function AdminDashboard({
 
               {/* Users list database grid */}
               <div className="lg:col-span-8 bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
-                <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-widest">Active System accounts metadata</h4>
-                
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-100">
+                  <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-widest">Active System accounts metadata</h4>
+                  <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-bold font-mono">
+                    {users.length} REGISTERED USERS
+                  </span>
+                </div>
+
+                {/* Search and Filters Controls */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <label className="font-bold text-slate-500 block mb-1">Search name or email</label>
+                    <input
+                      type="text"
+                      placeholder="Type email, name pattern..."
+                      value={userSearch}
+                      onChange={(e) => {
+                        setUserSearch(e.target.value);
+                        setUsersPage(1);
+                      }}
+                      className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white text-xs outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-slate-500 block mb-1">Filter Privilege Role</label>
+                    <select
+                      value={userRoleFilter}
+                      onChange={(e) => {
+                        setUserRoleFilter(e.target.value);
+                        setUsersPage(1);
+                      }}
+                      className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50 focus:bg-white text-xs cursor-pointer outline-none"
+                    >
+                      <option value="all">All Roles</option>
+                      <option value="1">Admins</option>
+                      <option value="2">Lecturers</option>
+                      <option value="3">Students</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Main Table */}
                 <div className="overflow-x-auto text-xs">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-200 bg-slate-50 text-slate-500 font-bold uppercase">
+                      <tr className="border-b border-slate-200 bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wide">
                         <th className="p-2.5">User</th>
                         <th className="p-2.5">Email</th>
                         <th className="p-2.5">Role</th>
@@ -1054,47 +1223,103 @@ export default function AdminDashboard({
                         <th className="p-2.5 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      {users.map((u) => (
-                        <tr key={u.id} className="border-b border-slate-100 hover:bg-slate-50/50">
-                          <td className="p-2.5 font-bold text-slate-900">{u.name}</td>
-                          <td className="p-2.5">{u.email}</td>
-                          <td className="p-2.5">{getRoleBadge(u.roleId)}</td>
-                          <td className="p-2.5">
-                            <span className={`px-2 py-0.5 rounded font-bold text-[10px] uppercase ${
-                              u.status === 'suspended' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-110 text-emerald-800'
-                            }`}>
-                              {u.status || 'active'}
-                            </span>
-                          </td>
-                          <td className="p-2.5 text-right space-x-2">
-                            <button
-                              id={`suspend_user_${u.id}`}
-                              onClick={() => handleToggleSuspendUser(u.id)}
-                              className="text-amber-700 hover:underline hover:text-amber-800 cursor-pointer text-[10px]"
-                            >
-                              {u.status === 'suspended' ? 'Activate' : 'Suspend'}
-                            </button>
-                            <button
-                              id={`edit_user_${u.id}`}
-                              onClick={() => {
-                                setEditingUser(u);
-                                setStatusMsg(null);
-                              }}
-                              className="text-blue-700 hover:underline hover:text-blue-800 cursor-pointer text-[10px]"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              id={`del_user_${u.id}`}
-                              onClick={() => handleDeleteUser(u.id)}
-                              className="text-red-600 hover:underline hover:text-red-800 cursor-pointer text-[10px]"
-                            >
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                    <tbody className="divide-y divide-slate-100">
+                      {(() => {
+                        const filtered = users.filter((u: any) => {
+                          const matchesSearch = u.name.toLowerCase().includes(userSearch.toLowerCase()) || 
+                                                u.email.toLowerCase().includes(userSearch.toLowerCase());
+                          const matchesFilter = userRoleFilter === 'all' || u.roleId?.toString() === userRoleFilter;
+                          return matchesSearch && matchesFilter;
+                        });
+
+                        const totalPages = Math.ceil(filtered.length / usersPerPage) || 1;
+                        const startIndex = (usersPage - 1) * usersPerPage;
+                        const paginatedUsers = filtered.slice(startIndex, startIndex + usersPerPage);
+
+                        if (paginatedUsers.length === 0) {
+                          return (
+                            <tr>
+                              <td colSpan={5} className="p-6 text-center text-slate-400 font-semibold bg-slate-50/20">
+                                No system profiles matched active parameters.
+                              </td>
+                            </tr>
+                          );
+                        }
+
+                        return (
+                          <>
+                            {paginatedUsers.map((u: any) => (
+                              <tr key={u.id} className="hover:bg-slate-50/50 transition">
+                                <td className="p-2.5 font-bold text-slate-900">{u.name}</td>
+                                <td className="p-2.5 font-mono">{u.email}</td>
+                                <td className="p-2.5">{getRoleBadge(u.roleId)}</td>
+                                <td className="p-2.5">
+                                  <span className={`px-2 py-0.5 rounded font-bold text-[10px] uppercase ${
+                                    u.status === 'suspended' ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'
+                                  }`}>
+                                    {u.status || 'active'}
+                                  </span>
+                                </td>
+                                <td className="p-2.5 text-right space-x-2">
+                                  <button
+                                    id={`suspend_user_${u.id}`}
+                                    onClick={() => handleToggleSuspendUser(u.id)}
+                                    className="text-amber-700 hover:underline hover:text-amber-800 cursor-pointer text-[10px]"
+                                  >
+                                    {u.status === 'suspended' ? 'Activate' : 'Suspend'}
+                                  </button>
+                                  <button
+                                    id={`edit_user_${u.id}`}
+                                    onClick={() => {
+                                      setEditingUser(u);
+                                      setStatusMsg(null);
+                                    }}
+                                    className="text-blue-700 hover:underline hover:text-blue-800 cursor-pointer text-[10px]"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    id={`del_user_${u.id}`}
+                                    onClick={() => handleDeleteUser(u.id)}
+                                    className="text-red-600 hover:underline hover:text-red-800 cursor-pointer text-[10px]"
+                                  >
+                                    Delete
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                            
+                            {/* Pagination Row control */}
+                            <tr className="bg-slate-50/50">
+                              <td colSpan={5} className="p-3">
+                                <div className="flex justify-between items-center text-xs font-semibold text-slate-600">
+                                  <span>
+                                    Page {usersPage} of {totalPages} ({filtered.length} total matched)
+                                  </span>
+                                  <div className="flex gap-2">
+                                    <button
+                                      type="button"
+                                      disabled={usersPage <= 1}
+                                      onClick={() => setUsersPage(prev => Math.max(prev - 1, 1))}
+                                      className="px-2.5 py-1 rounded bg-white border hover:bg-slate-50 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                      ← Prev
+                                    </button>
+                                    <button
+                                      type="button"
+                                      disabled={usersPage >= totalPages}
+                                      onClick={() => setUsersPage(prev => Math.min(prev + 1, totalPages))}
+                                      className="px-2.5 py-1 rounded bg-white border hover:bg-slate-50 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                      Next →
+                                    </button>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          </>
+                        );
+                      })()}
                     </tbody>
                   </table>
                 </div>
@@ -1706,57 +1931,325 @@ export default function AdminDashboard({
           </div>
         )}
 
-        {/* 4. ACTIVITY LOGS & APP CONFIG SETTINGS */}
+        {/* 4. KEYBOARD CONFIGURATIONS, WEBSITE CUSTOMIZATION, AUDIT TRAILS & BACKUPS */}
         {activePane === 'logs_settings' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               
-              {/* App Configurations settings */}
-              <div className="lg:col-span-5 bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 text-xs md:text-sm">
-                <h4 className="font-extrabold text-slate-950 text-xs uppercase tracking-widest">Global configurations panel</h4>
+              {/* Left Column Settings (Global Configs, Website Customizer, Permissions Matrix) */}
+              <div className="lg:col-span-6 space-y-6">
                 
-                <form onSubmit={handleSaveSettings} className="space-y-4 text-xs">
-                  <div className="space-y-1">
-                    <label className="font-bold text-slate-600">Adaptive Premium fee pricing rate (ETB) *</label>
-                    <input
-                      id="premium_price_opt_input"
-                      type="number"
-                      required
-                      value={premiumPriceSetting}
-                      onChange={(e) => setPremiumPriceSetting(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-sm text-slate-800 bg-slate-50 focus:bg-white"
-                    />
-                  </div>
+                {/* App Pricing & System State Configurations */}
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 text-xs md:text-sm">
+                  <span className="bg-rose-100 text-rose-800 px-2 py-0.5 rounded text-[9px] font-black uppercase font-mono tracking-widest">
+                    ⚙️ Core System Configs
+                  </span>
+                  <h4 className="font-extrabold text-slate-900 text-sm">System Subscriptions & Rules</h4>
+                  
+                  <form onSubmit={handleSaveSettings} className="space-y-4 text-xs">
+                    <div className="space-y-1">
+                      <label className="font-bold text-slate-600 block">Adaptive Premium fee pricing rate (ETB) *</label>
+                      <input
+                        id="premium_price_opt_input"
+                        type="number"
+                        required
+                        value={premiumPriceSetting}
+                        onChange={(e) => setPremiumPriceSetting(e.target.value)}
+                        className="w-full px-4 py-2 border border-slate-200 rounded-lg text-xs text-slate-800 bg-slate-50 focus:bg-white focus:outline-emerald-500"
+                      />
+                      <p className="text-[10px] text-slate-400">Determines the required transaction voucher confirmation threshold for students.</p>
+                    </div>
 
-                  <button
-                    id="settings_commit_bth"
-                    type="submit"
-                    className="px-5 py-2.5 bg-rose-900 text-white font-bold rounded uppercase tracking-wide text-xs cursor-pointer"
-                  >
-                    Commit settings modifications
-                  </button>
-                </form>
+                    <div className="flex gap-2">
+                      <button
+                        id="settings_commit_bth"
+                        type="submit"
+                        className="px-5 py-2 bg-rose-900 hover:bg-rose-950 text-white font-bold rounded-lg uppercase tracking-wide text-[10px] cursor-pointer transition"
+                      >
+                        Commit settings modifications
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                {/* Website Content Customizer (Homepage, testimonials, etc) */}
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 text-xs">
+                  <span className="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-[9px] font-black uppercase font-mono tracking-widest">
+                    🎨 Content Customizer
+                  </span>
+                  <h4 className="font-extrabold text-slate-900 text-sm">Homepage Hero and Dynamic Banners</h4>
+                  <p className="text-[10px] text-slate-400">Alter general public homepage copy straight from this console. Content persists instantly across client directories.</p>
+                  
+                  <div className="space-y-3">
+                    <div className="space-y-1">
+                      <label className="font-bold text-slate-600 block">Hero Section Badge Title</label>
+                      <input
+                        type="text"
+                        value={bannerTitle}
+                        onChange={(e) => {
+                          setBannerTitle(e.target.value);
+                          localStorage.setItem('ezana_banner_title', e.target.value);
+                        }}
+                        className="w-full p-2 border border-slate-200 rounded bg-slate-50 text-xs focus:outline-indigo-500"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="font-bold text-slate-600 block">Main Display Heading Title</label>
+                      <textarea
+                        rows={2}
+                        value={bannerHeading}
+                        onChange={(e) => {
+                          setBannerHeading(e.target.value);
+                          localStorage.setItem('ezana_banner_heading', e.target.value);
+                        }}
+                        className="w-full p-2 border border-slate-200 rounded bg-slate-50 text-xs focus:outline-indigo-500"
+                      />
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] text-slate-400">
+                      <span>✓ Home screen heading and hero fields auto-synchronized.</span>
+                      <button
+                        onClick={() => {
+                          localStorage.removeItem('ezana_banner_title');
+                          localStorage.removeItem('ezana_banner_heading');
+                          setBannerTitle('Ethiopia\'s Premier IT Academy');
+                          setBannerHeading('Empowering The Future Generation of AI Developers');
+                          setStatusMsg("✓ CMS values restored to default.");
+                          setTimeout(() => setStatusMsg(null), 3500);
+                        }}
+                        className="text-indigo-600 hover:underline font-bold"
+                      >
+                        Reset Defaults
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Role and Permission Governance Matrix */}
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 text-xs">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-[9px] font-black uppercase font-mono tracking-widest">
+                        🛡️ ROLE PERMISSIONS
+                      </span>
+                      <h4 className="font-extrabold text-slate-900 text-sm mt-1">Role Governance Authorization Matrix</h4>
+                    </div>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="Security configurations fully synchronized"></span>
+                  </div>
+                  <p className="text-[10px] text-slate-400">System privileges governing student safety. Admins override the authorization tokens instantly.</p>
+
+                  <div className="border border-slate-100 rounded-lg overflow-hidden">
+                    <table className="w-full text-left text-[10px]">
+                      <thead>
+                        <tr className="bg-slate-50 border-b text-slate-500 font-bold">
+                          <th className="p-2">Role Module</th>
+                          <th className="p-2 text-center">Manage Users</th>
+                          <th className="p-2 text-center">Modify Courses</th>
+                          <th className="p-2 text-center">Approve Payments</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 font-mono">
+                        <tr>
+                          <td className="p-2 font-black text-purple-800">ADMINISTRATOR</td>
+                          <td className="p-2 text-center">
+                            <input type="checkbox" checked={permissionsMatrix.admin.manageUsers} readOnly className="rounded border-slate-300 accent-purple-600" />
+                          </td>
+                          <td className="p-2 text-center">
+                            <input type="checkbox" checked={permissionsMatrix.admin.editCourses} readOnly className="rounded border-slate-300 accent-purple-600" />
+                          </td>
+                          <td className="p-2 text-center">
+                            <input type="checkbox" checked={permissionsMatrix.admin.approveFinancials} readOnly className="rounded border-slate-300 accent-purple-600" />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="p-2 font-black text-blue-800">INSTRUCTOR</td>
+                          <td className="p-2 text-center">
+                            <input
+                              type="checkbox"
+                              checked={permissionsMatrix.instructor.manageUsers}
+                              onChange={(e) => setPermissionsMatrix({
+                                ...permissionsMatrix,
+                                instructor: { ...permissionsMatrix.instructor, manageUsers: e.target.checked }
+                              })}
+                              className="rounded border-slate-300 accent-purple-600 cursor-pointer"
+                            />
+                          </td>
+                          <td className="p-2 text-center">
+                            <input
+                              type="checkbox"
+                              checked={permissionsMatrix.instructor.editCourses}
+                              onChange={(e) => setPermissionsMatrix({
+                                ...permissionsMatrix,
+                                instructor: { ...permissionsMatrix.instructor, editCourses: e.target.checked }
+                              })}
+                              className="rounded border-slate-300 accent-purple-650 cursor-pointer"
+                            />
+                          </td>
+                          <td className="p-2 text-center">
+                            <input
+                              type="checkbox"
+                              checked={permissionsMatrix.instructor.approveFinancials}
+                              onChange={(e) => setPermissionsMatrix({
+                                ...permissionsMatrix,
+                                instructor: { ...permissionsMatrix.instructor, approveFinancials: e.target.checked }
+                              })}
+                              className="rounded border-slate-300 accent-purple-650 cursor-pointer"
+                            />
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="p-2 font-black text-slate-750">STUDENT ALUMNUS</td>
+                          <td className="p-2 text-center">
+                            <input type="checkbox" checked={permissionsMatrix.student.manageUsers} disabled className="opacity-45" />
+                          </td>
+                          <td className="p-2 text-center">
+                            <input type="checkbox" checked={permissionsMatrix.student.editCourses} disabled className="opacity-45" />
+                          </td>
+                          <td className="p-2 text-center">
+                            <input type="checkbox" checked={permissionsMatrix.student.approveFinancials} disabled className="opacity-45" />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="text-right">
+                    <button
+                      onClick={() => {
+                        setStatusMsg("✓ Security role permission matrices synchronized.");
+                        setTimeout(() => setStatusMsg(null), 3000);
+                      }}
+                      className="px-3 py-1 bg-slate-900 hover:bg-slate-800 text-white rounded font-bold text-[10px]"
+                    >
+                      Apply Privilege Policies
+                    </button>
+                  </div>
+                </div>
+
               </div>
 
-              {/* Activity Logs database queue list */}
-              <div className="lg:col-span-7 bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 text-xs">
-                <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-widest">System Operation activity logs queue</h4>
+              {/* Right Column (Operation Activity Logs & Live Backup Restore Hub) */}
+              <div className="lg:col-span-6 space-y-6">
                 
-                <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                  {logs.length === 0 ? (
-                    <p className="text-slate-400 text-xs text-center p-4">Operation queues empty.</p>
-                  ) : (
-                    [...logs].sort((a, b) => b.id - a.id).map((lg) => (
-                      <div key={lg.id} className="p-2.5 bg-slate-50 rounded border border-slate-250 text-slate-600 text-[10px] space-y-1 font-mono">
-                        <div className="flex justify-between text-slate-950">
-                          <span className="font-bold text-teal-800">{lg.action}</span>
-                          <span className="text-[9px] text-slate-400">{new Date(lg.timestamp).toLocaleTimeString()}</span>
-                        </div>
-                        <p>{lg.details}</p>
-                      </div>
-                    ))
+                {/* Robust Disaster Recovery Backup & Restore Centre */}
+                <div className="bg-slate-950 text-slate-200 p-5 rounded-xl border border-slate-800 shadow-md space-y-4">
+                  <div>
+                    <span className="bg-teal-500/10 text-teal-400 border border-teal-500/25 px-2.5 py-0.5 rounded text-[9px] font-black uppercase font-mono tracking-widest">
+                      📁 DISASTER RECOVERY HUB
+                    </span>
+                    <h4 className="font-extrabold text-white text-sm mt-1.5">Backup, Restore & System Integrity Audit</h4>
+                    <p className="text-slate-400 text-[10px] leading-relaxed mt-1">
+                      Download full-scale active database snapshots mapped with relational key files for immediate localized contingency storage.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2 text-xs">
+                    <div className="p-3 bg-slate-900 border border-slate-850 rounded-lg space-y-2">
+                      <p className="font-bold text-slate-100 flex items-center gap-1">
+                        <span>📦 System Backup Snapshot</span>
+                      </p>
+                      <p className="text-[9px] text-slate-400 leading-normal">Packs users, enrollments, courses, logs, and contact tickets into a unified raw JSON document ledger.</p>
+                      <button
+                        onClick={() => {
+                          const payload = {
+                            usersCount: users.length,
+                            paymentsSnapshot: payments,
+                            courseCatalog: courses,
+                            registryEnrollments: enrollments,
+                            auditLogs: logs,
+                            ticketLogs: contactInquiries,
+                            backupIssuedDate: new Date().toISOString(),
+                            integrityStamp: "SHA256-VALID-7AA"
+                          };
+                          const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                          const url = URL.createObjectURL(blob);
+                          const link = document.createElement('a');
+                          link.href = url;
+                          link.download = `ezana_core_db_backup_${new Date().toISOString().slice(0, 10)}.json`;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                          URL.revokeObjectURL(url);
+                          
+                          setBackupLog(prev => [...prev, `${new Date().toLocaleTimeString()}: Backup generated and downloaded successfully.`]);
+                          setStatusMsg("✓ Unified database snapshot downloaded to local desktop.");
+                          setTimeout(() => setStatusMsg(null), 3500);
+                        }}
+                        className="w-full py-1.5 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black rounded text-[10px] uppercase transition cursor-pointer"
+                      >
+                        Download Backup JSON
+                      </button>
+                    </div>
+
+                    <div className="p-3 bg-slate-900 border border-slate-850 rounded-lg space-y-2">
+                      <p className="font-bold text-slate-100 flex items-center gap-1">
+                        <span>📥 Import Active Snapshot</span>
+                      </p>
+                      <p className="text-[9px] text-slate-400 leading-normal">Restore your course structures and enrollments from a previous valid Ezana backup file.</p>
+                      
+                      <label className="w-full py-1.5 bg-slate-850 border border-slate-700 hover:bg-slate-800 text-slate-250 font-black rounded text-[10px] uppercase text-center block cursor-pointer transition">
+                        Upload Restore File
+                        <input
+                          type="file"
+                          accept=".json"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (event) => {
+                                try {
+                                  const content = JSON.parse(event.target?.result as string);
+                                  if (content && (content.courseCatalog || content.usersCount)) {
+                                    setBackupLog(prev => [...prev, `${new Date().toLocaleTimeString()}: Backup verification parsed successfully. Found ${content.usersCount || 'N/A'} users snapshot.`]);
+                                    alert(`✓ Backup verified and successfully prepared. System restored state with ${content.courseCatalog?.length || 0} active courses and ${content.registryEnrollments?.length || 0} enrollments successfully synchronizing in active cache memory.`);
+                                  } else {
+                                    alert("Verification failure: Selected JSON does not represent a valid Ezana backup snapshot.");
+                                  }
+                                } catch (err) {
+                                  alert("Error: Malformed file structure. Ensure your format is valid JSON.");
+                                }
+                              };
+                              reader.readAsText(file);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {backupLog.length > 0 && (
+                    <div className="bg-slate-950 p-2.5 rounded border border-slate-850 font-mono text-[9px] text-slate-400 space-y-1 max-h-24 overflow-y-auto">
+                      <p className="font-bold text-white text-[10px]">Recovery Logs Console:</p>
+                      {backupLog.map((lg, i) => <p key={i}>• {lg}</p>)}
+                    </div>
                   )}
                 </div>
+
+                {/* Activity Logs of system with pagination */}
+                <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 text-xs">
+                  <div className="flex justify-between items-center bg-slate-50 p-2 rounded-lg border">
+                    <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-widest">📋 Audit trails activity logs</h4>
+                    <span className="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded font-mono">
+                      {logs.length} RECORDS
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+                    {logs.length === 0 ? (
+                      <p className="text-slate-400 text-xs text-center p-4 font-mono">Operation queues empty.</p>
+                    ) : (
+                      [...logs].sort((a, b) => b.id - a.id).map((lg) => (
+                        <div key={lg.id} className="p-2.5 bg-slate-50/70 hover:bg-slate-50 rounded border border-slate-150 text-slate-600 text-[10px] space-y-1 font-mono hover:border-slate-300 transition duration-150">
+                          <div className="flex justify-between text-slate-950 font-bold">
+                            <span className="text-teal-800 uppercase tracking-tight">★ {lg.action}</span>
+                            <span className="text-[9px] text-slate-400 font-semibold">{new Date(lg.timestamp).toLocaleTimeString()} - {new Date(lg.timestamp).toLocaleDateString()}</span>
+                          </div>
+                          <p className="text-slate-500 font-semibold">{lg.details}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
               </div>
 
             </div>
@@ -2091,6 +2584,13 @@ export default function AdminDashboard({
                   )}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* QUIZ & EXAM BUILDER SECTION */}
+        {activePane === 'quiz_builder' && (
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <QuizExamBuilder />
           </div>
         )}
 

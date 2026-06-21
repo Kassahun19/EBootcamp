@@ -154,34 +154,7 @@ function MainAppContent() {
     }
   }, [currentPage, user, token]);
 
-  useEffect(() => {
-    // Audit if database exists or holds courses on first launch
-    fetch('/api/courses')
-      .then(res => res.json())
-      .then(data => {
-        if (!data || data.length === 0) {
-          setDbEmpty(true);
-        }
-      })
-      .catch((e) => {
-        // Fallback to true if network is loading
-        setDbEmpty(true);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (user && (currentPage === 'home' || currentPage === 'login' || currentPage === 'register')) {
-      if (user.roleId === 1) {
-        setCurrentPage('admin');
-      } else if (user.roleId === 2) {
-        setCurrentPage('instructor');
-      } else {
-        setCurrentPage('dashboard');
-      }
-    }
-  }, [user]);
-
-  const triggerDbInstallation = async () => {
+  async function triggerDbInstallation() {
     try {
       setDbInstallStatus("Configuring relational MySQL database.json tables...");
       const res = await fetch('/install', { method: 'POST' });
@@ -199,7 +172,36 @@ function MainAppContent() {
     } catch (e) {
       setDbInstallStatus("Failed contacting backend installer.");
     }
-  };
+  }
+
+  useEffect(() => {
+    // Audit if database exists or holds courses on first launch
+    fetch('/api/courses')
+      .then(res => res.json())
+      .then(data => {
+        if (!data || data.length === 0) {
+          setDbEmpty(true);
+          triggerDbInstallation();
+        }
+      })
+      .catch((e) => {
+        // Fallback to true if network is loading
+        setDbEmpty(true);
+        triggerDbInstallation();
+      });
+  }, []);
+
+  useEffect(() => {
+    if (user && (currentPage === 'home' || currentPage === 'login' || currentPage === 'register')) {
+      if (user.roleId === 1) {
+        setCurrentPage('admin');
+      } else if (user.roleId === 2) {
+        setCurrentPage('instructor');
+      } else {
+        setCurrentPage('dashboard');
+      }
+    }
+  }, [user]);
 
   const handleNavigate = (page: string, params?: any) => {
     setCurrentPage(page);

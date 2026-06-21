@@ -81,9 +81,9 @@ class DatabaseEngine {
 
   constructor() {
     this.load();
-    // If database contains no user records, auto-install default seeds to guarantee instant functional state
-    if (this.data.users.length === 0) {
-      console.log("Database is empty on start. Running automated table seeding and initialization routines...");
+    // If database contains no user or course records, auto-install default seeds to guarantee instant functional state
+    if (this.data.users.length === 0 || !this.data.courses || this.data.courses.length === 0) {
+      console.log("Database is empty or missing courses on start. Running automated table seeding and initialization routines...");
       this.installDatabase();
     }
   }

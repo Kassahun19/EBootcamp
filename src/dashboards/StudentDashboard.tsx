@@ -9,6 +9,11 @@ interface Lesson {
   title: string;
   description: string;
   youtubeId: string;
+  videoUrl?: string;
+  lessonType?: 'video' | 'text' | 'resource';
+  textContent?: string;
+  downloadUrl?: string;
+  resourceTitle?: string;
   isPreview: boolean;
   duration: string;
 }
@@ -109,6 +114,32 @@ export default function StudentDashboard({
   const [profileName, setProfileName] = useState(user?.name || '');
   const [profilePassword, setProfilePassword] = useState('');
   const [settingStatus, setSettingStatus] = useState<string | null>(null);
+
+  // Advanced HTML5 video controls
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
+  const [lastSavedBookmark, setLastSavedBookmark] = useState<number>(0);
+  const [bookmarkAlert, setBookmarkAlert] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (selectedLesson && user && selectedCourse && enrollments.length > 0) {
+      const enrollmentObj = enrollments.find(e => e.courseId === selectedCourse.id);
+      if (enrollmentObj && enrollmentObj.progressDetails) {
+        const matchingProgress = enrollmentObj.progressDetails.find((p: any) => p.lessonId === selectedLesson.id);
+        if (matchingProgress && matchingProgress.resumePosition) {
+          const pos = matchingProgress.resumePosition;
+          setLastSavedBookmark(pos);
+          setBookmarkAlert(`⏳ Stored watch progress found! Resuming presentation from ${Math.floor(pos)} seconds.`);
+          setTimeout(() => setBookmarkAlert(null), 5500);
+        } else {
+          setLastSavedBookmark(0);
+          setBookmarkAlert(null);
+        }
+      } else {
+        setLastSavedBookmark(0);
+        setBookmarkAlert(null);
+      }
+    }
+  }, [selectedLesson?.id]);
 
   // Streak/Gamification Simulator
   const [learningStreak] = useState(3); // Active streak
@@ -237,9 +268,12 @@ export default function StudentDashboard({
       const certRes = await fetch('/api/certificates', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      let serverCerts = [];
       if (certRes.ok) {
-        setCerts(await certRes.json());
+        serverCerts = await certRes.json();
       }
+      const localCerts = JSON.parse(localStorage.getItem('ezana_custom_certs') || '[]');
+      setCerts([...serverCerts, ...localCerts]);
     } catch (e) {
       console.error("Failed loading student workspace datasets:", e);
     } finally {
@@ -273,9 +307,35 @@ export default function StudentDashboard({
     try {
       // Quizzes
       const qres = await fetch(`/api/courses/${courseId}/quizzes`);
+      let list: any[] = [];
       if (qres.ok) {
-        setQuizzes(await qres.json());
+        list = await qres.json();
       }
+
+      // Read custom lecturer quiz questions from localStorage
+      const customSaved = localStorage.getItem('ezana_custom_quizzes');
+      if (customSaved) {
+        const parsed = JSON.parse(customSaved);
+        const courseQuestions = parsed.filter((q: any) => q.courseId === courseId);
+        if (courseQuestions.length > 0) {
+          list.push({
+            id: 10000 + courseId,
+            courseId: courseId,
+            title: "🎓 Senior Lecturer Custom Exam",
+            description: "An elite diagnostic assessment compiled dynamically by your course instructor.",
+            passingScore: 70,
+            questions: courseQuestions.map((q: any) => ({
+              id: q.id,
+              questionText: q.question,
+              type: 'multiple_choice',
+              options: q.choices,
+              correctAnswer: q.correctAnswer
+            }))
+          });
+        }
+      }
+
+      setQuizzes(list);
       // Assignments
       const ares = await fetch(`/api/courses/${courseId}/assignments`);
       if (ares.ok) {
@@ -301,6 +361,8 @@ export default function StudentDashboard({
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
+          lessonId: selectedLesson.id,
+          resumePosition: 0, // completion resets bookmark to start
           progress: computedPercent,
           completed: computedPercent >= 100
         })
@@ -325,7 +387,73 @@ export default function StudentDashboard({
   // Submit assessment answer sheets
   const handleQuizSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedQuiz || !token) return;
+    if (!selectedQuiz) return;
+
+    // Check if virtual mock or custom local storage quiz
+    if (selectedQuiz.id >= 10000) {
+      try {
+        setQuizSubmitLoading(true);
+        // Simulate minor delay
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        let correctCount = 0;
+        selectedQuiz.questions.forEach((q: any) => {
+          const userAnsIndex = quizAnswers[q.id];
+          const userAns = q.options?.[parseInt(userAnsIndex)] || userAnsIndex;
+          const isCorrect = String(userAns).trim().toLowerCase() === String(q.correctAnswer).trim().toLowerCase();
+          if (isCorrect) correctCount++;
+        });
+
+        const totalCount = selectedQuiz.questions.length || 1;
+        const score = Math.round((correctCount / totalCount) * 100);
+        const passed = score >= (selectedQuiz.passingScore || 70);
+
+        setQuizAtStatus({
+          score,
+          passed,
+          correctCount,
+          totalCount,
+          solved: true
+        });
+
+        // Set detailed correction descriptions
+        const explanations: Record<number, string> = {};
+        selectedQuiz.questions.forEach((q: any) => {
+          const userAnsIndex = quizAnswers[q.id];
+          const userAns = q.options?.[parseInt(userAnsIndex)] || userAnsIndex || 'Blank';
+          const isCorrect = String(userAns).trim().toLowerCase() === String(q.correctAnswer).trim().toLowerCase();
+          explanations[q.id] = isCorrect
+            ? `Correct! "${userAns}" matches standard academic proof patterns perfectly.`
+            : `Review Insight: Your choice "${userAns}" was incorrect. Standard model choice is: "${q.correctAnswer}".`;
+        });
+        setExplanationMap(explanations);
+
+        // If passed, award an authentic certificate!
+        if (passed) {
+          const localCerts = JSON.parse(localStorage.getItem('ezana_custom_certs') || '[]');
+          const matches = localCerts.some((c: any) => c.courseId === selectedQuiz.courseId);
+          if (!matches) {
+            const freshCert = {
+              id: Date.now(),
+              courseName: selectedCourse?.title || "Advanced Engineering Program",
+              certificateNumber: `EZ-CERT-${Math.floor(100000 + Math.random() * 900000)}`,
+              issuedAt: new Date().toISOString()
+            };
+            const updated = [...localCerts, freshCert];
+            localStorage.setItem('ezana_custom_certs', JSON.stringify(updated));
+            setCerts(prev => [...prev, freshCert]);
+            alert(`🎉 Academic milestone achieved! Certified reference: ${freshCert.certificateNumber}. Available in your portfolio.`);
+          }
+        }
+      } catch (err) {
+        console.error("Local scoring issue:", err);
+      } finally {
+        setQuizSubmitLoading(false);
+      }
+      return;
+    }
+
+    if (!token) return;
 
     try {
       setQuizSubmitLoading(true);
@@ -353,9 +481,13 @@ export default function StudentDashboard({
         selectedQuiz.questions?.forEach((q: any) => {
           const answerUser = quizAnswers[q.id];
           const isCorrect = String(q.correctOptionIndex) === answerUser || q.correctAnswer === answerUser;
-          explanations[q.id] = isCorrect
+          let feedback = isCorrect
             ? `Correct Choice! "${q.options?.[parseInt(answerUser)] || answerUser}" is the mathematically and contextually sound choice.`
             : `Review Insight: Your choice "${q.options?.[parseInt(answerUser)] || answerUser || 'Blank'}" was incorrect. The accurate solution is: "${q.options?.[q.correctOptionIndex] || q.correctAnswer}".`;
+          if (q.explanation) {
+            feedback += ` Additional explanation: ${q.explanation}`;
+          }
+          explanations[q.id] = feedback;
         });
         setExplanationMap(explanations);
 
@@ -883,6 +1015,13 @@ export default function StudentDashboard({
                 
                 {/* Embedded YouTube video player & tabs */}
                 <div className="lg:col-span-8 space-y-4">
+                  {bookmarkAlert && (
+                    <div className="p-3 bg-blue-900/90 border border-blue-800 text-blue-100 rounded-lg text-xs flex justify-between items-center shadow-lg font-bold leading-normal">
+                      <span>{bookmarkAlert}</span>
+                      <button type="button" onClick={() => setBookmarkAlert(null)} className="text-[10px] uppercase font-black tracking-wide text-slate-300">Dismiss</button>
+                    </div>
+                  )}
+
                   <div className={`aspect-video rounded-xl overflow-hidden relative transition-all duration-500 ${
                     focusMode === 'theater' 
                       ? 'bg-black border-2 border-emerald-500/40 shadow-2xl scale-[1.01]' 
@@ -891,14 +1030,111 @@ export default function StudentDashboard({
                         : 'bg-slate-950 border border-slate-850 shadow-md'
                   }`}>
                     {selectedLesson ? (
-                      <iframe
-                        id="unlisted_yt_player"
-                        src={`https://www.youtube.com/embed/${selectedLesson.youtubeId}?autoplay=0&rel=0&modestbranding=1`}
-                        title={selectedLesson.title}
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      ></iframe>
+                      selectedLesson.lessonType === 'text' ? (
+                        <div className="w-full h-full p-6 sm:p-8 bg-white overflow-y-auto text-slate-800 space-y-4">
+                          <header className="pb-3 border-b border-slate-200">
+                            <span className="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wide font-mono">
+                              📄 Lecture Documentation / Chapter Article
+                            </span>
+                          </header>
+                          <div className="prose prose-slate max-w-none text-xs leading-relaxed font-sans whitespace-pre-wrap">
+                            {selectedLesson.textContent || "No text defined for this lecture. Feel free to download resources or mark as read."}
+                          </div>
+                        </div>
+                      ) : selectedLesson.lessonType === 'resource' ? (
+                        <div className="w-full h-full p-6 bg-slate-50 flex flex-col items-center justify-center text-center space-y-4 border border-dashed border-slate-200">
+                          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center border border-amber-200 text-amber-700 shadow-sm animate-pulse">
+                            <FileText className="w-8 h-8" />
+                          </div>
+                          <div>
+                            <h4 className="font-extrabold text-slate-900 text-sm md:text-base">{selectedLesson.resourceTitle || "Download Lecture Supplementary PDF Template"}</h4>
+                            <p className="text-slate-400 text-xs mt-1">Reading handouts and reference slides compiled by Ezana Senior Lecturers.</p>
+                          </div>
+                          <a
+                            href={selectedLesson.downloadUrl || "/uploads/receipt_placeholder.pdf"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-5 py-2.5 bg-slate-900 hover:bg-amber-600 text-amber hover:text-slate-950 font-extrabold hover:text-slate-950 rounded text-xs transition uppercase tracking-wider"
+                          >
+                            Open Slide Resource Handout ↓
+                          </a>
+                        </div>
+                      ) : (
+                        /* Default to Video Player rendering */
+                        selectedLesson.videoUrl ? (
+                          <div className="w-full h-full relative group">
+                            <video
+                              id="ezana_native_video_element"
+                              key={selectedLesson.id}
+                              src={selectedLesson.videoUrl}
+                              className="w-full h-full object-contain"
+                              controls
+                              onLoadedMetadata={(e) => {
+                                const video = e.currentTarget;
+                                video.playbackRate = playbackSpeed;
+                                if (lastSavedBookmark > 0) {
+                                  video.currentTime = lastSavedBookmark;
+                                }
+                              }}
+                              onPause={async (e) => {
+                                const video = e.currentTarget;
+                                const currentTime = video.currentTime;
+                                if (token) {
+                                  await fetch(`/api/enrollments/${selectedCourse.id}/progress`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                                    body: JSON.stringify({
+                                      lessonId: selectedLesson.id,
+                                      resumePosition: currentTime
+                                    })
+                                  });
+                                }
+                              }}
+                              onSeeked={async (e) => {
+                                const video = e.currentTarget;
+                                const currentTime = video.currentTime;
+                                if (token) {
+                                  await fetch(`/api/enrollments/${selectedCourse.id}/progress`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                                    body: JSON.stringify({
+                                      lessonId: selectedLesson.id,
+                                      resumePosition: currentTime
+                                    })
+                                  });
+                                }
+                              }}
+                            />
+                            
+                            {/* Control speeds deck inside Native video viewport */}
+                            <div className="absolute right-3 top-3 bg-slate-900/90 backdrop-blur-xs p-1.5 rounded-lg border border-slate-700/50 flex gap-1 items-center text-[9px] text-white opacity-90 group-hover:opacity-100 transition shadow-md z-10">
+                              <span className="font-bold opacity-60">SPEED:</span>
+                              {[0.5, 1.0, 1.5, 2.0].map((spd) => (
+                                <button
+                                  key={spd}
+                                  onClick={() => {
+                                    setPlaybackSpeed(spd);
+                                    const video = document.getElementById('ezana_native_video_element') as HTMLVideoElement;
+                                    if (video) video.playbackRate = spd;
+                                  }}
+                                  className={`px-1.5 py-0.5 rounded font-bold cursor-pointer transition ${playbackSpeed === spd ? 'bg-amber-500 text-slate-950 font-extrabold' : 'hover:bg-slate-800'}`}
+                                >
+                                  {spd}x
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <iframe
+                            id="unlisted_yt_player"
+                            src={`https://www.youtube.com/embed/${selectedLesson.youtubeId}?autoplay=0&rel=0&modestbranding=1`}
+                            title={selectedLesson.title}
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          ></iframe>
+                        )
+                      )
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
                         <Play className="w-12 h-12 text-slate-650" />
@@ -1142,6 +1378,7 @@ export default function StudentDashboard({
                             setSelectedQuiz(q);
                             setQuizAnswers({});
                             setQuizAtStatus({ solved: false });
+                            setQuizTimerValue(q.duration ? q.duration * 60 : 600);
                           }}
                           className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 font-bold text-white text-xs transition rounded cursor-pointer shrink-0"
                         >
